@@ -12,8 +12,9 @@ cloud, receive data from it and hand it down to the device, which is able to dis
     - [Recommendations](#recommendations)
     - [HAW Communication Agent](#extension)
     - [UIC AWS Connection Server](#database)
+    - [Configurations](#configurations)
+- [FAQ](#faq)
 - [License](#license)
-- [Links](#links)
 
 
 ## Architecture Overview
@@ -41,6 +42,7 @@ Let's first take a look at the recommended software for the installation.
 To guarantee an optimal installation process it is recommended to use the tools, which were used in writing the HAW CA.
 
 The following tools were used:
+- [Windows 10](https://www.microsoft.com/de-de/windows)
 - [Visual Studio 2017 IDE](https://visualstudio.microsoft.com/vs/)
 - [IntelliJ IDE](https://www.jetbrains.com/idea/)
 - [Java SE Development Kit 1.8](https://www.java.com/)
@@ -72,3 +74,103 @@ Visual Studio will now build the launcher, which may take some time. After the b
 Start the launcher by double-clicking the executable file. An terminal should open and provide information about the activities of the
 
 ### UIC AWS Connection Server
+
+TODO: UAS installation guide. (compile .jar, configuration, basic setup)
+
+###  Configurations
+
+To start the HAW Communication Agent two config.properties files have to be specified. One for the HAW CA and one for the UAS.
+
+The config.properties of the UAS can be found under \AWS_CA\java\sample-configuration.
+``` python
+# \AWS_CA\java\sample-configuration\config.properties
+
+# The region of the aws server that is used (f.e. server: data.iot.us-west-2.amazonaws.com => region: us-west-2)
+region=us-west-2
+
+
+# the certificate file
+cert=INSERT_CERTIFICATE_FILENAME
+
+
+# the ClientID for this Instance. MUST be unique in the whole project
+clientid=CHANGEME123
+
+
+# The praefix of the aws server that is used (f.e. server: data.iot.us-west-2.amazonaws.com => prasefix: data   )
+praefix=data
+
+
+# the file that contains the private key of the certificate
+private_key_file=INSERT_PRIVATE_KEY_FILENAME
+
+
+# the quality of service that is sued for publishes
+qos=1
+
+
+# true: a certification is used for authentication (only way implemented yet)
+usecert=true
+
+
+# the topic that is used for pushing data such as Attributes and DataPoints
+# CAN be overwritten in the http-post-request
+push_topic=myProject/push
+
+
+# the topic that is used for the Initiation
+# CAN be overwritten in the http-post-request
+init_topic=myProject/init
+
+
+# the topic that is used for the subscription and the backchannel feature
+backchannel_topic=myProject/back
+
+
+# the url for the REST API of the UIC (default: localhost:8081/backchannel)
+backchannel_url=http://localhost:8081/backchannel
+
+# the algorithm of the certificate (not needed)
+# algorithm_cert=
+
+# the file that contains the public key of the certificate(not needed)
+# public_key_file=
+```
+
+The config.properties file of the HAW CA can be found in TODO:
+
+``` python
+# port for the REST API of the uic
+port_uic = 8081
+
+# port for the REST API of the UIC-AWS-ConnectionServer
+port_uas = 8080
+```
+
+## FAQ
+#### How to compile the HAW Communication Agent?
+Please follow the instructions shown under [HAW Communication Agent](#extension). Basically you have to import the .NET project into Visual Studio and compile the "UIC.SGeT.Launcher.csproj" by right-clicking on it and choosing the build option.
+
+#### Where do I find the executable file to start the HAW Communication Agent?
+The HAW CA executable can be found under AWS_CA\c#\UIC\UIC.SGeT.Launcher\bin\Debug. The file you need to start is called UIC.SGeT.Launcher
+
+#### The configuration can't be loaded. How do I solve this problem?
+As you compile the HAW Communication Agent please make sure to choose the right processor architecture. If Any is selected you definitely have to adjust the option to your processor architecture.
+
+#### Which configurations are used to change local setting?
+- uic_config.json
+- project.json
+
+#### Is there anything to change in those files?
+Make sure that in the uic_config.json the value if "ProjectJsonFilePath" is set to the path of the project.json.
+
+Also, "IsRemoteProjectLoadingEnabled" hast to be set false.
+
+#### Is it possible to use a UNIX operating system to work on the HAW CA?
+Yes, the Microsoft .Net Framework can be used. Differences between the windows and the unix version may occur. Therefore we recommend to stick with using Visual Studio in Windows because it was used in the development process.
+
+## license
+
+[![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
+- **[MIT license](http://opensource.org/licenses/mit-license.php)**
+- Copyright 2018 © Daniel Krüger, Sebastian Niksch, Michael Klemmer, Till Seeberger.
