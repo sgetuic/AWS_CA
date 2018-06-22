@@ -6,7 +6,7 @@
 
     <groupId>de.StackSmashersLA</groupId>
     <artifactId>AWS-UIC-ConnectionServer</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <properties>
         <jetty.version>9.3.14.v20161028</jetty.version>

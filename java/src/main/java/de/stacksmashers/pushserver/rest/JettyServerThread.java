@@ -1,5 +1,8 @@
 package de.stacksmashers.pushserver.rest;
 
+
+import de.stacksmashers.pushserver.config.Configuration;
+import de.stacksmashers.pushserver.config.ConfigurationLoader;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -13,12 +16,18 @@ public class JettyServerThread extends Thread {
 
     static final String APPLICATION_PATH = "/rest";
     static final String CONTEXT_ROOT = "/";
+    private final Configuration configuration;
+
+    public JettyServerThread() {
+        configuration = new ConfigurationLoader().loadConfig();
+    }
+
 
     /**
      * Starts the REST API via Jetty Server
      */
     public void run() {
-        final int port = 8080;
+        final int port = configuration.portUAS();
         final Server server = new Server(port);
 
         // Setup the basic Application "context" at "/".

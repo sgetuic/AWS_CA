@@ -10,6 +10,7 @@ using UIC.Framework.Interfaces.Edm;
 using UIC.Framework.Interfaces.Edm.Definition;
 using UIC.Framework.Interfaces.Edm.Value;
 using UIC.Framework.Interfaces.Project;
+using UIC.Framweork.DefaultImplementation;
 using UIC.SGET.ConnectorImplementation.Monitoring;
 using UIC.Util;
 using UIC.Util.Logging;
@@ -81,8 +82,6 @@ namespace UIC.SGET.ConnectorImplementation
                 
             }
 
-
-
             UicProject project = LoadUicProject();
 
             SerialId = GernerateApplianceSerialKey(project);
@@ -129,6 +128,19 @@ namespace UIC.SGET.ConnectorImplementation
 
         private void PushAttributeValues(UicProject project) {
             // read and publish 
+
+
+            Console.WriteLine("[HAW DEBUG] Name:" + project.Name);
+            Console.WriteLine("[HAW DEBUG] Project Key:" + project.ProjectKey);
+            Console.WriteLine("[HAW DEBUG] Description:" + project.Description);
+            Console.WriteLine("[HAW DEBUG] Owner:" + project.Owner);
+            Console.WriteLine("[HAW DEBUG] Attributes:" + project.Attributes);
+            Console.WriteLine("[HAW DEBUG] DataPointsTaks:" + project.DatapointTasks);
+
+
+
+
+
             foreach (var attribtueDefinition in project.Attributes) {
                 try
                 {
@@ -163,14 +175,14 @@ namespace UIC.SGET.ConnectorImplementation
         private UicProject LoadUicProject() {
             UicProject project;
             var serializedProjectFilepath = _uicConfiguartion.ProjectJsonFilePath;
-            var jsonFileHandler = new ConfigurationJsonFileHandler(serializedProjectFilepath, _serializer, _logger);
+           var jsonFileHandler = new ConfigurationJsonFileHandler(serializedProjectFilepath, _serializer, _logger);
             
             if (_uicConfiguartion.IsRemoteProjectLoadingEnabled) {
                 project = _projectAgent.LoadProject(_uicConfiguartion);
                 jsonFileHandler.Backup(project);
             }
             else {
-                project = jsonFileHandler.Load<UicProject>();
+                project = jsonFileHandler.Load<SgetUicProject>();
             }
 
             if (project == null) throw new ApplicationException("no project could be loaded");

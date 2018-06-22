@@ -15,7 +15,7 @@
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
         <Console name="CONSOLE" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level - AWS-UIC-CONNECTIONSERVER: %n%msg%n"/>
         </Console>
     </Appenders>
 
