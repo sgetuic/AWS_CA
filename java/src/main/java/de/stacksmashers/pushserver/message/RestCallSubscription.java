@@ -30,6 +30,7 @@ public class RestCallSubscription extends AWSIotTopic {
 
     private static final Logger logger = LogManager.getLogger(RestCallSubscription.class);
     private static  final JsonFactory factory = new JsonFactory();
+    public static final String BACKCHANNEL_PATH = "/backchannel/";
 
     private final ConnectionHistory connectionHistory = new ConnectionHistory();
     private final Configuration configuration;
@@ -45,8 +46,7 @@ public class RestCallSubscription extends AWSIotTopic {
         try {
             final String payload = message.getStringPayload();
             connectionHistory.add(System.currentTimeMillis(), "Received Message on topic: \"" + topic + "\" with payload: \"" + payload + "\"");
-            logger.error("Received Message on topic: {} with payload {}", topic, payload);
-         // String entity = "{\"topic\":\"" + message.getTopic() + "\",\"payload\":\"" + message.getStringPayload() + "\"}";
+            logger.info("Received Message on topic: {} with payload {}", topic, payload);
             String entity = messageToJson(message);
             sendPost(entity);
         } catch (IOException e) {
@@ -85,7 +85,9 @@ public class RestCallSubscription extends AWSIotTopic {
     public void sendPost(String entity){
         try {
             HttpClient httpClient = HttpClientBuilder.create().build();
-            String postURL = configuration.backchannelUrl();
+            //String postURL = configuration.backchannelUrl();
+            String postURL = "http://localhost:" + configuration.portUIC() + BACKCHANNEL_PATH;
+
             HttpPost post = new HttpPost(postURL);
             StringEntity input = new StringEntity(entity, APPLICATION_JSON);
             post.setEntity(input);

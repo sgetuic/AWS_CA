@@ -1,5 +1,7 @@
 package de.stacksmashers.pushserver.pushing;
 
+import de.stacksmashers.pushserver.config.Configuration;
+import de.stacksmashers.pushserver.config.ConfigurationLoader;
 import de.stacksmashers.pushserver.receiving.SubscriptionService;
 import de.stacksmashers.pushserver.rest.JettyServerThread;
 import org.apache.logging.log4j.core.config.Configurator;
@@ -11,19 +13,14 @@ public class Start {
 
     private static final String CONFIG_FILE_LOGGING = "log4j2.xml";
 
-    //TODO Dependency Injection?
-    //TODO how to
-    //TODO doku
-
-
     public static void main(String[] args) {
         //configure the file for the logging configuration
         configurateLogging();
         //start to subscribe on the backchannel topic
         SubscriptionService.get().initiateDataStoreSunscription();
-
+        Configuration configuration = new ConfigurationLoader().loadConfig();
         PushService pushService = PushService.get();
-        pushService.push("<id>/status", "Hello World test 1234");
+        pushService.push("status/" + configuration.clientId() , "UAS started.");
         JettyServerThread jettyServerThread = new JettyServerThread();
         jettyServerThread.start();
     }

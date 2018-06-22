@@ -1,24 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using UIC.Communication.M2mgo.CommunicationAgent.Configuration;
-using UIC.Communication.M2mgo.CommunicationAgent.Mqtt;
-using UIC.Communication.M2mgo.CommunicationAgent.Mqtt.messaging;
-using UIC.Communication.M2mgo.CommunicationAgent.Mqtt.messaging.Payload;
-using UIC.Communication.M2mgo.CommunicationAgent.Mqtt.messaging.Topic;
-using UIC.Communication.M2mgo.CommunicationAgent.Translation.DeviceManagement;
-using UIC.Communication.M2mgo.CommunicationAgent.Translation.Project;
-using UIC.Communication.M2mgo.CommunicationAgent.WebApi;
-using UIC.Communication.M2mgo.CommunicationAgent.WebApi.infrastructure;
 using UIC.Framework.Interfaces.Edm;
 using UIC.Framework.Interfaces.Edm.Value;
 using UIC.Framework.Interfaces.Project;
 using UIC.Util.Logging;
 using UIC.Util.Serialization;
 using HAW.AWS.CommunicationAgent.Wrapper;
-using System.ServiceModel.Web;
 using HAW.AWS.CommunicationAgent.RESTClient;
+using HAW.AWS.CommunicationAgent.Backchannel;
+using System.Web.Script.Serialization;
+using UIC.Framweork.DefaultImplementation;
+using UIC.Framework.Interfaces.Edm.Definition;
+using HAW.AWS.CommunicationAgent.PropertiesFileReaders;
 
 namespace HAW.AWS.CommunicationAgent 
 {
@@ -27,6 +21,14 @@ namespace HAW.AWS.CommunicationAgent
         private ISerializer serializer;
         private ILoggerFactory _loggerFactory;
         private ILogger _logger;
+        private Action<Command> _commandHandler;
+        private List<EmbeddedDriverModule> _edms;
+        private PropertiesFileReader _propertyreader;
+
+        public static string CONFIG_PATH ="config.properties";
+        private static HAWCommunicationAgent _instance;
+        private readonly Dictionary<Guid, CommandDefinition> _guidUicCommandMap = new Dictionary<Guid, CommandDefinition>();
+        private readonly Dictionary<Guid, List<CommandDefinition>> _guidUicSensorCommandMap = new Dictionary<Guid, List<CommandDefinition>>();
 
         public HAWCommunicationAgent(ISerializer serializer, ILoggerFactory loggerFactory)
         {
@@ -35,13 +37,18 @@ namespace HAW.AWS.CommunicationAgent
             _logger = loggerFactory.GetLoggerFor(GetType());
             _logger.Information("HAW Communication Agent built.");
 
+            _propertyreader = new PropertiesFileReader(CONFIG_PATH);
             Thread RestServiceThread = new Thread(RestServer.startRESTService);
             RestServiceThread.Start();
+            _instance = this;
         }
 
         public void Connect(Action<Command> commandHandler)
         {
-            RESTClient.RESTClient.PostAsync(DataAndAttributeValueWrapper.GetJSON("Connect"), _logger);
+
+         _commandHandler = commandHandler;
+         RESTClient.RESTClient.PostAsync(DataAndAttributeValueWrapper.GetJSON("Connect"), _logger);
+
         }
 
         public void Debug(string debug)
@@ -56,7 +63,25 @@ namespace HAW.AWS.CommunicationAgent
 
         public void Initialize(string serialId, UicProject project, List<EmbeddedDriverModule> edms)
         {
-            RESTClient.RESTClient.Initialize(serialId, DataAndAttributeValueWrapper.GetJSON("Initialise"), _logger);
+
+            _edms = edms;
+
+            List<EDMWrapper> edmWrappers = new List<EDMWrapper>();
+            foreach (EmbeddedDriverModule element in edms)
+            {
+                //building of ther maps
+                BuildEdmMap(element.GetCapability());
+
+                // edms must be converted in a actual type to serialize the capabilities
+                edmWrappers.Add(new EDMWrapper(element));
+            }
+
+
+
+
+
+            RESTClient.RESTClient.Initialize(serialId, DataAndAttributeValueWrapper.GetJSON(edmWrappers), _logger);
+
         }
 
         public void Push(DatapointValue value)
@@ -78,5 +103,68 @@ namespace HAW.AWS.CommunicationAgent
         {
             RESTClient.RESTClient.PostAsync(DataAndAttributeValueWrapper.GetJSON(values), _logger);
         }
+
+        public static HAWCommunicationAgent getInstance()
+        {
+            return _instance;
+
+        }
+
+        public void handleCommand(UICRESTDataContract contract)
+        {
+            String commandStr = contract.payload;
+            JavaScriptSerializer ser = new JavaScriptSerializer();
+            CommandContract commandContract = ser.Deserialize<CommandContract>(contract.payload);
+
+            foreach (EmbeddedDriverModule element in _edms)
+            {
+                if (element.Identifier.Id.Equals(new Guid(commandContract.id)))
+                {
+                    Console.WriteLine("[DEBUG] Found fitting EDM for command");
+                    element.Handle(GetCommandFromContract(commandContract));
+                }
+
+            }
+
+
+        }
+
+
+
+
+
+
+
+        public Command GetCommandFromContract(CommandContract contract)
+        {
+            var id = new Guid(contract.commandId);
+            var commandDefinition = _guidUicCommandMap[id];
+            return new SgetCommand(commandDefinition, contract.commandPayload);
+        }
+
+
+        private void BuildEdmMap(EdmCapability edmCapability)
+        {
+            foreach (var command in edmCapability.CommandDefinitions)
+            {
+                _guidUicCommandMap.Add(command.Id, command);
+                if (command.RelatedDatapoint != null)
+                {
+                    List<CommandDefinition> commandList;
+                    if (_guidUicSensorCommandMap.TryGetValue(command.RelatedDatapoint.Id, out commandList))
+                    {
+                        commandList.Add(command);
+                    }
+                    else
+                    {
+                        _guidUicSensorCommandMap.Add(command.RelatedDatapoint.Id, new List<CommandDefinition> { command });
+                    }
+                }
+            }
+        }
+
+
+
+
     }
 }
