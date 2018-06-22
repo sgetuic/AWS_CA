@@ -11,8 +11,8 @@ cloud, receive data from it and hand it down to the device, which is able to dis
 - [Installation & Setup](#Installation and Setup)
     - [Recommendations](#recommendations)
     - [Configurations](#configurations)
-    - [HAW Communication Agent](#extension)
-    - [UIC AWS Connection Server](#database)
+    - [HAW Communication Agent](#HAW Communication Agent)
+    - [UIC AWS Connection Server](#UIC AWS Connection Server)
 - [Start](#start)
 - [FAQ](#faq)
 - [License](#license)
@@ -54,7 +54,15 @@ To start the HAW Communication Agent two configuration files have to be specifie
 
 #### config.properties of the HAW CA
 
-TODO
+After compiling the HAW CA you have to create a config.properties file in the path of "AWS_CA\c#\UIC\UIC.SGeT.Launcher\bin\Debug". In this configuration the ports are set by which the HAW CA communcates with the UAS.
+
+``` python
+# port for the REST API of the uic
+port_uic = 8081
+
+# port for the REST API of the UIC-AWS-ConnectionServer
+port_uas = 8080
+```
 
 #### config.properties of the UAS
 The config.properties of the UAS can be found under \AWS_CA\java\sample-configuration.
@@ -111,16 +119,6 @@ backchannel_url=http://localhost:8081/backchannel
 
 # the file that contains the public key of the certificate(not needed)
 # public_key_file=
-```
-
-The config.properties file of the HAW CA can be found in TODO:
-
-``` python
-# port for the REST API of the uic
-port_uic = 8081
-
-# port for the REST API of the UIC-AWS-ConnectionServer
-port_uas = 8080
 ```
 
 ### UIC AWS Connection Server
