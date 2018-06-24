@@ -7,15 +7,15 @@ cloud, receive data from it and hand it down to the device, which is able to dis
 
 ## Table of content
 
-- [Architecture Overview](#Architecture-Overview)
-- [Installation and Setup](#Installation-and-Setup)
+- [Architecture Overview](#architecture-overview)
+- [Installation and Setup](#installation-and-setup)
     - [Recommendations](#recommendations)
-    - [HAW Communication Agent](#HAW-Communication-Agent)
-    - [UIC AWS Connection Server](#UIC-AWS-Connection-Server)
+    - [HAW Communication Agent](#haw-communication-agent)
+    - [UIC AWS Connection Server](#uic-aws-connection-server)
     - [Configurations](#configurations)
-- [Start](#Start)
-- [FAQ](#Faq)
-- [License](#License)
+- [Start](#start)
+- [FAQ](#faq)
+- [License](#license)
 
 
 ## Architecture Overview
@@ -81,7 +81,7 @@ Now write "package" in the Command line and press "Execute". This will build the
 
 ![Maven Command](readme_images/execute_maven_command.png)
 
-Note: Before starting the UAS make sure the config.properties file is defined as display under [config.properties of the UAS](config.properties-of-the-UAS).
+Note: Before starting the UAS make sure the config.properties file is defined as display under [config.properties of the UAS](config.properties-of-the-uas).
 
 To start the UAS start the AWS-UIC-ConnectionServer-1.0-SNAPSHOT.jar by double-clicking on it on your system's explorer.
 
@@ -109,7 +109,8 @@ Visual Studio will now build the launcher, which may take some time. After the b
 
 ![Build Launcher](readme_images/launcher_exe.png)  
 
-Note: Before starting the HAW CA make sure the config.properties file is defined as displayed under [config.properties of the HAW CA](config.properties-of-the-HAW-CA).
+Note: Before starting the HAW CA make sure the config.properties file is defined as displayed under [config.properties of the HAW CA](config.properties-of-the-haw-ca).
+
 Start the launcher by double-clicking the executable file. An terminal should open and provide information about the activities of the HAW CA.
 
 ###  Configurations
@@ -209,9 +210,9 @@ As you compile the HAW Communication Agent please make sure to choose the right 
 - project.json
 
 #### Is there anything to change in those files?
-Make sure that in the uic_config.json the value if "ProjectJsonFilePath" is set to the path of the project.json.
+Make sure that in the uic_config.json the value "ProjectJsonFilePath" is set to the path of the project.json.
 
-Also, "IsRemoteProjectLoadingEnabled" hast to be set false.
+Also, "IsRemoteProjectLoadingEnabled" has to be set false.
 
 #### Is it possible to use a UNIX operating system to work on the HAW CA?
 Yes, the Microsoft .Net Framework can be used. Differences between the windows and the unix version may occur. Therefore we recommend to stick with using Visual Studio in Windows because it was used in the development process.
