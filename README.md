@@ -119,7 +119,7 @@ Start the launcher by double-clicking the executable file. An terminal should op
 
 To start the HAW Communication Agent two configuration files have to be specified. One for the HAW CA and one for the UAS.
 
-#### config.properties of the UAS
+#### Configuration of the UAS
 The config.properties of the UAS has to be created in the same folder of the .jar file. (default after compilation: "\AWS_CA\CA\target")
 
 ``` python
