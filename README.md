@@ -81,7 +81,7 @@ Now write "package" in the Command line and press "Execute". This will build the
 
 ![Maven Command](readme_images/execute_maven_command.png)
 
-Note: Before starting the UAS make sure the config.properties file is defined as display under [config.properties of the UAS](config.properties-of-the-uas).
+Note: Before starting the UAS make sure the config.properties file is defined as display under [config\.properties of the UAS](config.properties-of-the-uas).
 
 To start the UAS start the AWS-UIC-ConnectionServer-1.0-SNAPSHOT.jar by double-clicking on it on your system's explorer.
 
@@ -109,7 +109,7 @@ Visual Studio will now build the launcher, which may take some time. After the b
 
 ![Build Launcher](readme_images/launcher_exe.png)  
 
-Note: Before starting the HAW CA make sure the config.properties file is defined as displayed under [config.properties of the HAW CA](config.properties-of-the-haw-ca).
+Note: Before starting the HAW CA make sure the config.properties file is defined as displayed under [config\.properties of the HAW CA](config.properties-of-the-haw-ca).
 
 Start the launcher by double-clicking the executable file. An terminal should open and provide information about the activities of the HAW CA.
 
@@ -197,7 +197,7 @@ To stat the HAW CA follow the steps below:
 
 ## FAQ
 #### How to compile the HAW Communication Agent?
-Please follow the instructions shown under [HAW Communication Agent](#extension). Basically you have to import the .NET project into Visual Studio and compile the "UIC.SGeT.Launcher.csproj" by right-clicking on it and choosing the build option.
+Please follow the instructions shown under [HAW Communication Agent](#haw-communication-agent). Basically you have to import the .NET project into Visual Studio and compile the "UIC.SGeT.Launcher.csproj" by right-clicking on it and choosing the build option.
 
 #### Where do I find the executable file to start the HAW Communication Agent?
 The HAW CA executable can be found under AWS_CA\c#\UIC\UIC.SGeT.Launcher\bin\Debug. The file you need to start is called UIC.SGeT.Launcher
