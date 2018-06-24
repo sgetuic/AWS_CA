@@ -7,15 +7,15 @@ cloud, receive data from it and hand it down to the device, which is able to dis
 
 ## Table of content
 
-- [Architecture Overview](#Architecture Overview)
-- [Installation & Setup](#Installation and Setup)
+- [Architecture Overview](#Architecture-Overview)
+- [Installation and Setup](#Installation-and-Setup)
     - [Recommendations](#recommendations)
+    - [HAW Communication Agent](#HAW-Communication-Agent)
+    - [UIC AWS Connection Server](#UIC-AWS-Connection-Server)
     - [Configurations](#configurations)
-    - [HAW Communication Agent](#HAW Communication Agent)
-    - [UIC AWS Connection Server](#UIC AWS Connection Server)
-- [Start](#start)
-- [FAQ](#faq)
-- [License](#license)
+- [Start](#Start)
+- [FAQ](#Faq)
+- [License](#License)
 
 
 ## Architecture Overview
@@ -36,7 +36,7 @@ These parts are:
 ## Installation and Setup
 
 The installation of the HAW CA consists of simple steps, which are displayed on the following lines.
-Basically you have to setup two enviroments: The Communication Agent and the UIC AWS Connection Server.
+Basically you have to setup two environments: The Communication Agent and the UIC AWS Connection Server.
 Let's first take a look at the recommended software for the installation.
 
 ## Recommendations
@@ -48,13 +48,77 @@ The following tools were used:
 - [IntelliJ IDE](https://www.jetbrains.com/idea/)
 - [Java SE Development Kit 1.8](https://www.java.com/)
 
+### UIC AWS Connection Server
+
+To import the project in your system start the IntelliJ IDE. A prompt should ask you to either to create a new project or import an existing one. Choose "Import Project" and select the \AWS_CA\java folder of the cloned repository.
+
+![Start IntelliJ](readme_images/import_IntelliJ.png)
+
+As this java component is a maven project you have to import it as a maven project by choosing "import project from external model" and then choosing Maven. Then click "Next".
+
+![Select Maven](readme_images/select_maven.png)
+
+Check that the settings of your project resemble the ones of the following image.
+
+![Maven Options](readme_images/maven_options.png)
+
+Next.
+
+![Maven import](readme_images/maven_import2.png)
+
+Finish.
+
+![Final Maven import](readme_images/import_final.png)
+
+The maven project should now be imported by IntelliJ. This may take a while.
+
+When the Maven project is imported open the Maven Projects explorer.
+To compile the UAS select "Execute Maven goal" in Maven Projects explorer.
+
+![Maven Build](readme_images/maven_build.png)
+
+Now write "package" in the Command line and press "Execute". This will build the required .jar file to launch the UAS, which can be found under the target folder.
+
+![Maven Command](readme_images/execute_maven_command.png)
+
+Note: Before starting the UAS make sure the config.properties file is defined as display under [config.properties of the UAS](config.properties-of-the-UAS).
+
+To start the UAS start the AWS-UIC-ConnectionServer-1.0-SNAPSHOT.jar by double-clicking on it on your system's explorer.
+
+### HAW Communication Agent
+
+To open the Communication Agent in the Visual Studio IDE open Visual Studio, click File -> Open -> project map or use CTRL+SHIFT+O.
+
+![Open Project Map](readme_images/open_projectmap.png)
+
+In the opening dialog navigate in the UIC directory \AWS_CA\c#\UIC.
+
+![Open SLN](readme_images/open_sln.png)
+
+This should open the project in Visual Studio. On the right side of the IDE you can see the project map
+explorer. The following projects are used for the HAW Communication Agent:
+- HAW.AWS.CommunicationAgent (The implementation of the CA)
+- AWSCommunicationAgent (The interface for the Communication Agent)
+- UIC.SGeT.Launcher (The launcher of the communication agents)
+
+To compile the HAW Communication Agent you have to build the UIC.SGeT.Launcher by right-clicking on it in the project explorer and choosing the build option in the context menu.
+
+![Build Launcher](readme_images/build_launcher.png)
+
+Visual Studio will now build the launcher, which may take some time. After the building is done you can find the executable in AWS_CA\c#\UIC\UIC.SGeT.Launcher\bin\Debug in your system's explorer.
+
+![Build Launcher](readme_images/launcher_exe.png)  
+
+Note: Before starting the HAW CA make sure the config.properties file is defined as displayed under [config.properties of the HAW CA](config.properties-of-the-HAW-CA).
+Start the launcher by double-clicking the executable file. An terminal should open and provide information about the activities of the HAW CA.
+
 ###  Configurations
 
 To start the HAW Communication Agent two configuration files have to be specified. One for the HAW CA and one for the UAS.
 
 #### config.properties of the HAW CA
 
-After compiling the HAW CA you have to create a config.properties file in the path of "AWS_CA\c#\UIC\UIC.SGeT.Launcher\bin\Debug". In this configuration the ports are set by which the HAW CA communcates with the UAS.
+After compiling the HAW CA you have to create a config.properties file in the path of "AWS_CA\c#\UIC\UIC.SGeT.Launcher\bin\Debug". In this configuration the ports are set by which the HAW CA communicates with the UAS.
 
 ``` python
 # port for the REST API of the uic
@@ -65,7 +129,8 @@ port_uas = 8080
 ```
 
 #### config.properties of the UAS
-The config.properties of the UAS can be found under \AWS_CA\java\sample-configuration.
+The config.properties of the UAS has to be created in the same folder of the .jar file. (default after compilation: "\AWS_CA\CA\target")
+
 ``` python
 # \AWS_CA\java\sample-configuration\config.properties
 
@@ -121,65 +186,7 @@ backchannel_url=http://localhost:8081/backchannel
 # public_key_file=
 ```
 
-### UIC AWS Connection Server
 
-To import the project in your system start the IntelliJ IDE. A prompt should ask you to either create a new project or import an existing one. Choose "Import Project" and select the \AWS_CA\java folder of the cloned repository.
-
-![Start IntelliJ](readme_images/import_IntelliJ.png)
-
-As this java component is a maven project you have to import it as a maven project by choosing "import project from external model" and then choosing Maven. Then click "Next".
-
-![Select Maven](readme_images/select_maven.png)
-
-Check that the settings of your project resemble the ones of the following image.
-
-![Maven Options](readme_images/maven_options.png)
-
-Next.
-
-![Maven import](readme_images/maven_import2.png)
-
-Finish.
-
-![Final Maven import](readme_images/import_final.png)
-
-The maven project should now be imported by IntelliJ. This may take a while.
-
-When the Maven project is imported open the Maven Projects explorer.
-To compile the UAS select "Execute Maven goal" in Maven Projects explorer.
-
-![Maven Build](readme_images/maven_build.png)
-
-Now write "package" in the Command line and press "Execute". This will build the required .jar file to launch the UAS, which can be found under the target folder.
-
-![Maven Command](readme_images/execute_maven_command.png)
-
-To start the UAS start the AWS-UIC-ConnectionServer-1.0-SNAPSHOT.jar by double-clicking on it on your system's explorer.
-### HAW Communication Agent
-
-To open the Communication Agent in the Visual Studio IDE open Visual Studio, click File -> Open -> project map or use CTRL+SHIFT+O.
-
-![Open Project Map](readme_images/open_projectmap.png)
-
-In the opening dialog navigate in the UIC directory \AWS_CA\c#\UIC.
-
-![Open SLN](readme_images/open_sln.png)
-
-This should open the project in Visual Studio. On the right side of the IDE you can see the project map
-explorer. The following projects are used for the HAW Communication Agent:
-- HAW.AWS.CommunicationAgent (The implementation of the CA)
-- AWSCommunicationAgent (The interface for the Communication Agent)
-- UIC.SGeT.Launcher (The launcher of the communication agents)
-
-To compile the HAW Communication Agent you have to build the UIC.SGeT.Launcher by right-clicking on it in the project explorer and choosing the build option in the context menu.
-
-![Build Launcher](readme_images/build_launcher.png)
-
-Visual Studio will now build the launcher, which may take some time. After the building is done you can find the executable in AWS_CA\c#\UIC\UIC.SGeT.Launcher\bin\Debug in your system's explorer.
-
-![Build Launcher](readme_images/launcher_exe.png)  
-
-Start the launcher by double-clicking the executable file. An terminal should open and provide information about the activities of the HAW CA.
 
 ## Start
 
