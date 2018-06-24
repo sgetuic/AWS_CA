@@ -83,7 +83,7 @@ Now write "package" in the Command line and press "Execute". This will build the
 
 ![Maven Command](readme_images/execute_maven_command.png)
 
-Note: Before starting the UAS make sure the config.properties file is defined as display under [configuration of the UAS](config\.properties-of-the-uas).
+Note: Before starting the UAS make sure the config.properties file is defined as display under [configuration of the UAS](#configuration-of-the-uas).
 
 To start the UAS start the AWS-UIC-ConnectionServer-1.0-SNAPSHOT.jar by double-clicking on it on your system's explorer.
 
@@ -111,7 +111,7 @@ Visual Studio will now build the launcher, which may take some time. After the b
 
 ![Build Launcher](readme_images/launcher_exe.png)  
 
-Note: Before starting the HAW CA make sure the config.properties file is defined as displayed under [Configuration of the HAW CA](configuration-of-the-haw-ca).
+Note: Before starting the HAW CA make sure the config.properties file is defined as displayed under [Configuration of the HAW CA](#configuration-of-the-haw-ca).
 
 Start the launcher by double-clicking the executable file. An terminal should open and provide information about the activities of the HAW CA.
 
