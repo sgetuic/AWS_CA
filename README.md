@@ -13,6 +13,8 @@ cloud, receive data from it and hand it down to the device, which is able to dis
     - [UIC AWS Connection Server](#uic-aws-connection-server)
     - [HAW Communication Agent](#haw-communication-agent)
     - [Configurations](#configurations)
+          - [Configuration of the UAS](#configuration-of-the-uas)
+          - [Configuration of the HAW CA](#configuration-of-the-haw-ca)
 - [Start](#start)
 - [FAQ](#faq)
 - [License](#license)
@@ -81,7 +83,7 @@ Now write "package" in the Command line and press "Execute". This will build the
 
 ![Maven Command](readme_images/execute_maven_command.png)
 
-Note: Before starting the UAS make sure the config.properties file is defined as display under [config.properties of the UAS](config\.properties-of-the-uas).
+Note: Before starting the UAS make sure the config.properties file is defined as display under [configuration of the UAS](config\.properties-of-the-uas).
 
 To start the UAS start the AWS-UIC-ConnectionServer-1.0-SNAPSHOT.jar by double-clicking on it on your system's explorer.
 
@@ -109,25 +111,13 @@ Visual Studio will now build the launcher, which may take some time. After the b
 
 ![Build Launcher](readme_images/launcher_exe.png)  
 
-Note: Before starting the HAW CA make sure the config.properties file is defined as displayed under [config.properties of the HAW CA](config\.properties-of-the-haw-ca).
+Note: Before starting the HAW CA make sure the config.properties file is defined as displayed under [Configuration of the HAW CA](configuration-of-the-haw-ca).
 
 Start the launcher by double-clicking the executable file. An terminal should open and provide information about the activities of the HAW CA.
 
 ###  Configurations
 
 To start the HAW Communication Agent two configuration files have to be specified. One for the HAW CA and one for the UAS.
-
-#### config.properties of the HAW CA
-
-After compiling the HAW CA you have to create a config.properties file in the path of "AWS_CA\c#\UIC\UIC.SGeT.Launcher\bin\Debug". In this configuration the ports are set by which the HAW CA communicates with the UAS.
-
-``` python
-# port for the REST API of the uic
-port_uic = 8081
-
-# port for the REST API of the UIC-AWS-ConnectionServer
-port_uas = 8080
-```
 
 #### config.properties of the UAS
 The config.properties of the UAS has to be created in the same folder of the .jar file. (default after compilation: "\AWS_CA\CA\target")
@@ -187,6 +177,17 @@ backchannel_url=http://localhost:8081/backchannel
 # public_key_file=
 ```
 
+#### Configuration of the HAW CA
+
+After compiling the HAW CA you have to create a config.properties file in the path of "AWS_CA\c#\UIC\UIC.SGeT.Launcher\bin\Debug". In this configuration the ports are set by which the HAW CA communicates with the UAS.
+
+``` python
+# port for the REST API of the uic
+port_uic = 8081
+
+# port for the REST API of the UIC-AWS-ConnectionServer
+port_uas = 8080
+```
 
 
 ## Start
