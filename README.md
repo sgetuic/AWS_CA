@@ -26,9 +26,9 @@ supported via libraries by AWS.
 
 The three main parts of the HAW Communication Agent is displayed in the black rectangle of the following image.
 These parts are:
-- UIC AWS Connection Server
-- HAW Communication Agent
-- Configurations
+- UIC AWS Connection Server (UAS)
+- HAW Communication Agent (HAW CA)
+- Configurations (config.properties)
 ![HAW CA Architecture](readme_images/haw_ca_architecture.png)
 
 
