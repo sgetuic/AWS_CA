@@ -10,9 +10,11 @@ cloud, receive data from it and hand it down to the device, which is able to dis
 - [Architecture Overview](#architecture-overview)
 - [Installation and Setup](#installation-and-setup)
     - [Recommendations](#recommendations)
-    - [HAW Communication Agent](#haw-communication-agent)
     - [UIC AWS Connection Server](#uic-aws-connection-server)
+    - [HAW Communication Agent](#haw-communication-agent)
     - [Configurations](#configurations)
+        - [Configuration of the UAS](#configuration-of-the-uas)
+        - [Configuration of the HAW CA](#configuration-of-the-haw-ca)
 - [Start](#start)
 - [FAQ](#faq)
 - [License](#license)
@@ -81,7 +83,7 @@ Now write "package" in the Command line and press "Execute". This will build the
 
 ![Maven Command](readme_images/execute_maven_command.png)
 
-Note: Before starting the UAS make sure the config.properties file is defined as display under [config.properties of the UAS](config.properties-of-the-uas).
+Note: Before starting the UAS make sure the config.properties file is defined as display under [configuration of the UAS](#configuration-of-the-uas).
 
 To start the UAS start the AWS-UIC-ConnectionServer-1.0-SNAPSHOT.jar by double-clicking on it on your system's explorer.
 
@@ -109,7 +111,7 @@ Visual Studio will now build the launcher, which may take some time. After the b
 
 ![Build Launcher](readme_images/launcher_exe.png)  
 
-Note: Before starting the HAW CA make sure the config.properties file is defined as displayed under [config.properties of the HAW CA](config.properties-of-the-haw-ca).
+Note: Before starting the HAW CA make sure the config.properties file is defined as displayed under [Configuration of the HAW CA](#configuration-of-the-haw-ca).
 
 Start the launcher by double-clicking the executable file. An terminal should open and provide information about the activities of the HAW CA.
 
@@ -117,19 +119,7 @@ Start the launcher by double-clicking the executable file. An terminal should op
 
 To start the HAW Communication Agent two configuration files have to be specified. One for the HAW CA and one for the UAS.
 
-#### config.properties of the HAW CA
-
-After compiling the HAW CA you have to create a config.properties file in the path of "AWS_CA\c#\UIC\UIC.SGeT.Launcher\bin\Debug". In this configuration the ports are set by which the HAW CA communicates with the UAS.
-
-``` python
-# port for the REST API of the uic
-port_uic = 8081
-
-# port for the REST API of the UIC-AWS-ConnectionServer
-port_uas = 8080
-```
-
-#### config.properties of the UAS
+#### Configuration of the UAS
 The config.properties of the UAS has to be created in the same folder of the .jar file. (default after compilation: "\AWS_CA\CA\target")
 
 ``` python
@@ -187,6 +177,17 @@ backchannel_url=http://localhost:8081/backchannel
 # public_key_file=
 ```
 
+#### Configuration of the HAW CA
+
+After compiling the HAW CA you have to create a config.properties file in the path of "AWS_CA\c#\UIC\UIC.SGeT.Launcher\bin\Debug". In this configuration the ports are set by which the HAW CA communicates with the UAS.
+
+``` python
+# port for the REST API of the uic
+port_uic = 8081
+
+# port for the REST API of the UIC-AWS-ConnectionServer
+port_uas = 8080
+```
 
 
 ## Start
@@ -197,7 +198,7 @@ To stat the HAW CA follow the steps below:
 
 ## FAQ
 #### How to compile the HAW Communication Agent?
-Please follow the instructions shown under [HAW Communication Agent](#extension). Basically you have to import the .NET project into Visual Studio and compile the "UIC.SGeT.Launcher.csproj" by right-clicking on it and choosing the build option.
+Please follow the instructions shown under [HAW Communication Agent](#haw-communication-agent). Basically you have to import the .NET project into Visual Studio and compile the "UIC.SGeT.Launcher.csproj" by right-clicking on it and choosing the build option.
 
 #### Where do I find the executable file to start the HAW Communication Agent?
 The HAW CA executable can be found under AWS_CA\c#\UIC\UIC.SGeT.Launcher\bin\Debug. The file you need to start is called UIC.SGeT.Launcher
