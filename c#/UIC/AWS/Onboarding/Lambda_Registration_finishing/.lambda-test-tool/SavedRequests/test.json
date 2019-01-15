@@ -1,0 +1,16 @@
+{
+  "eventType": "THING_EVENT",
+  "eventId": "763eaf59194d1f9fa72ade0358940691",
+  "timestamp": 1547475365183,
+  "operation": "CREATED",
+  "accountId": "721814442376",
+  "thingId": "0f489181-090e-4f72-81c4-61c273ae86f3",
+  "thingName": "Device123456asdqw",
+  "versionNumber": 1,
+  "thingTypeName": null,
+  "billinGroupName": null,
+  "attributes": {
+    "CRTId": "arn:aws:iot:eu-central-1:721814442376:cert/1263391e5cc91195bf2be0c610e73b9aec6aa419d349f54740b2d9fdec8e20e5",
+    "SerialNr": "123456asdqw"
+  }
+}
