@@ -19,7 +19,7 @@ namespace SerialNrRegistrator
         private static readonly string TimeStampUTCKeyString = AWSConfigs.GetConfig("TimeStampUTCKeyStr");
 
 
-        private static readonly string ConditionExpressionString = "attribute_not_exists(Registered)";
+        private static readonly string ConditionExpressionString = "attribute_not_exists("+ SerialNrKeyString+")";
         
         private static String serialNrInput;
 

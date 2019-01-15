@@ -19,37 +19,41 @@ namespace Function
         private Dictionary<string, AttributeValue> _thingTableItem;
 
         /* DynamoDB key names.*/
-        private readonly string TableName = "DeviceSerialNumbers";
-        private readonly string SerialNrKey = "SerialNr";
-        private readonly string RegistredBoolKey = "Registered";
-        private readonly string TimeStampUTCKey = "TimeStampUTC";
-        private readonly string RegistrationTimeStampCKey = "TimeStampRegisteredUTC";
-        private readonly string RegistrationSuccessfullKey = "RegistrationSuccessfull";
-        private readonly string CommentKey = "RegistrationComment";
+        private static readonly string TableName                    = "DeviceSerialNumbers";
+        private static readonly string SerialNrKey                  = "SerialNr";
+        private static readonly string RegistredBoolKey             = "Registered";
+        private static readonly string TimeStampUTCKey              = "TimeStampUTC";
+        private static readonly string RegistrationTimeStampCKey    = "TimeStampRegisteredUTC";
+        private static readonly string RegistrationSuccessfullKey   = "RegistrationSuccessfull";
+        private static readonly string CommentKey                   = "RegistrationComment";
 
         /*Policy name to be attached to the Thing in the AWS IoT Core*/
-        private readonly string PolicyName = "OnboardedDevice";
+        private static readonly string PolicyName = "OnboardedDevice";
         /*Group Names for moving the Thing accordingly.*/
-        private readonly string OnboardingFailedGroupName = "OnboardingFailed";
-        private readonly string OnboardedGroupName = "OnboardedDevices";
+        private static readonly string OnboardingFailedGroupName    = "OnboardingFailed";
+        private static readonly string OnboardedGroupName           = "OnboardedDevices";
 
         /*Registration Failure Reasons*/
 
-        private readonly string FailedString_CouldNotRetrieveFromDBString = "Device info not found in DB";
-        private readonly string FailedString_TimeStampInvalid = "TimeStamp did not validate";
-        private readonly string FailedString_PolicyAttaching = "Failed to Attach the Policy";
-        private readonly string FailedString_CertificateAttaching = "Failed to Attach the Certificate";
-        private readonly string FailedString_UpdateDB = "Failed to update Database";
-        private readonly string FailedString_AlreadyRegistered = "SerialNr was already redistered";
-        private readonly string SuccessString = "OK";
+        private static readonly string FailedString_CouldNotRetrieveFromDBString    = "Device info not found in DB";
+        private static readonly string FailedString_TimeStampInvalid                = "TimeStamp did not validate";
+        private static readonly string FailedString_PolicyAttaching                 = "Failed to Attach the Policy";
+        private static readonly string FailedString_CertificateAttaching            = "Failed to Attach the Certificate";
+        private static readonly string FailedString_UpdateDB                        = "Failed to update Database";
+        private static readonly string FailedString_AlreadyRegistered               = "SerialNr was already redistered";
+        private static readonly string SuccessString                                = "OK";
 
 
         /*Amazon service clients*/
         IAmazonIoT _IoTclient = new AmazonIoTClient();
         AmazonDynamoDBClient _dbClient = new AmazonDynamoDBClient();
-
+        
         /*Time Frame for TimeStamp Validation in Minutes.*/
         private readonly int ExpirationTimeFrameMin = 10;
+
+        /*DynamoDB conditional Expresions*/
+        private static readonly string Condition_SerialNrExists     = "attribute_exists(" + SerialNrKey + ")";
+        private static readonly string Condition_SerialNrNotExists  = "attribute_not_exists("+ SerialNrKey + ")";
 
 
 
@@ -69,7 +73,7 @@ namespace Function
 
             if (await getThingItemFromDB())
             {
-                if (isRegistrationValid())
+                if (await isRegistrationValid())
                 {
                    
                     if (await attachPolicyToCertificateAsync())
@@ -84,40 +88,50 @@ namespace Function
                             else
                             {
                                 LambdaLogger.Log("upDateItemFailed");
-                                registrationFailed(FailedString_UpdateDB);
+                                await registrationFailed(FailedString_UpdateDB);
                             }
                         }
                         else
                         {
-                            LambdaLogger.Log("certifaceAttaching failed");
-                            registrationFailed(FailedString_CertificateAttaching);
+                            LambdaLogger.Log("certificateAttaching failed");
+                            await registrationFailed(FailedString_CertificateAttaching);
                         }
                     }
                     else
                     {
                         LambdaLogger.Log("policyAttached failed");
-                        registrationFailed(FailedString_PolicyAttaching);
+                        await registrationFailed(FailedString_PolicyAttaching);
                     }
                 }
                 else
                 {
                     LambdaLogger.Log("isRegistrationValid() failed");
+                    //isRegistrationValid() does registrationFailed()
                 }
 
             }
             else {
                 LambdaLogger.Log("getThingItemFromDB() failed");
-                registrationFailed(FailedString_CouldNotRetrieveFromDBString);
+                await registrationFailed(FailedString_CouldNotRetrieveFromDBString);
             }
 
          
             return registrationDone;
         }
 
-        private async void registrationFailed(string reason)
+        private async Task<bool> registrationFailed(string reason)
         {
-            await upDateItem(TableName, _serialNr, false, _timeStampUTC, _registrationTimeStampUTC, false, reason);
-            await moveThingToGroup(OnboardingFailedGroupName);
+            LambdaLogger.Log("\n RegistrationFailed : TableName = " + TableName + " _serialNr = " + _serialNr + " _timeStampUTC = " + _timeStampUTC + " _registrationTimeStampUTC = " + _registrationTimeStampUTC + " reason = " + reason + "\n");
+
+            if (reason != FailedString_CouldNotRetrieveFromDBString)
+            {
+                return (await upDateItem(TableName, _serialNr, false, _timeStampUTC, _registrationTimeStampUTC, false, reason)
+                    &&
+                    await moveThingToGroup(OnboardingFailedGroupName));
+            }
+            return (await putItem(TableName, _serialNr, false, _timeStampUTC, _registrationTimeStampUTC, false, reason, Condition_SerialNrNotExists)
+                    &&
+                    await moveThingToGroup(OnboardingFailedGroupName));
         }
 
         /**Moves the Thing to a named Group*/
@@ -159,8 +173,8 @@ namespace Function
 
             // Issue request
             var result = await _dbClient.GetItemAsync(request);
-            LambdaLogger.Log("\ngetThingItemFromDB(): "+result.ToString());
             LambdaLogger.Log("\nresult.Item.Count: "+ result.Item.Count);
+       
             if (result.Item.Count > 0)
             {
                 _thingTableItem = result.Item;
@@ -171,12 +185,12 @@ namespace Function
 
         }
         /**Checks if the Table Item for the Device to be Registered in AWS IoT core is valid*/
-        private bool isRegistrationValid() {
+        private async Task<bool> isRegistrationValid() {
             LambdaLogger.Log(_thingTableItem.ToString());
 
             if (isRegistered()) {
                 LambdaLogger.Log("Already Registered");
-                registrationFailed(FailedString_AlreadyRegistered);
+                await registrationFailed(FailedString_AlreadyRegistered);
 
                 return false;
             }
@@ -184,7 +198,7 @@ namespace Function
             if (!isTimeStampValid())
             {
                 LambdaLogger.Log("Time Stamp Expired");
-                registrationFailed(FailedString_TimeStampInvalid);
+                await registrationFailed(FailedString_TimeStampInvalid);
                 return false;
             }
             LambdaLogger.Log("RegistrationValid");
@@ -238,12 +252,14 @@ namespace Function
             return response.HttpStatusCode == System.Net.HttpStatusCode.OK;
         }
 
-
-
-
         /**Updates Table Item for the registrated Device in the Database.
          */
         private async Task<bool> upDateItem(string tableName, string serialNr, bool registered, long timeStampUTC, long registrationTimeStampUTC, bool registrationSuccessful, string comment)
+        {
+            return await putItem(tableName, serialNr, registered, timeStampUTC, registrationTimeStampUTC, registrationSuccessful, comment, Condition_SerialNrExists);
+        }
+
+        private async Task<bool> putItem(string tableName, string serialNr, bool registered, long timeStampUTC, long registrationTimeStampUTC, bool registrationSuccessful, string comment, string conditionalExpression)
         {
             var request = new PutItemRequest
             {
@@ -254,7 +270,7 @@ namespace Function
                         S = serialNr
                     }},
                     { RegistredBoolKey, new AttributeValue {
-                        BOOL = true
+                        BOOL = registered
                     }},
                     { TimeStampUTCKey, new AttributeValue {
                         N = timeStampUTC.ToString()
@@ -272,14 +288,24 @@ namespace Function
                     }}
 
                 },
-                ConditionExpression = "attribute_exists(Registered)"
+                ConditionExpression = conditionalExpression
 
             };
 
             PutItemResponse response = await _dbClient.PutItemAsync(request);
-            return response.HttpStatusCode== System.Net.HttpStatusCode.OK;
+            return response.HttpStatusCode == System.Net.HttpStatusCode.OK;
         }
-
+        
+        
+        /*TODO: As a security messurement remove Onboarding User policy if registration was invalid.*/
+        private void DetachUserPolicy()
+        {
+            throw new NotImplementedException();
+        }
+        
+        
     }
 }
+
+  
 
