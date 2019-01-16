@@ -5,7 +5,7 @@ using Amazon;
 using Amazon.IoT;
 using Amazon.IoT.Model;
 
-/* TODO: If Onboarding Started a second time, CRT and KEY will be overwritten but the device will not be not registered with the new certificates, invalidating the device authentication.
+/* 
  */
 namespace UIC.AWS.Onboarding.Device
 {
@@ -24,77 +24,147 @@ namespace UIC.AWS.Onboarding.Device
         private static readonly string SerialNr                     = AWSConfigs.GetConfig("DeviceSerialNumber");
 
         /**Device name. Will be concatenated with SerialNr */
-        private static string _name = AWSConfigs.GetConfig("DeviceName"); 
+        private static readonly string DeviceName                   = AWSConfigs.GetConfig("DeviceName")+ SerialNr; 
 
         private static string _CRTid;
 
 
         public static void Main(string[] args)
         {
-            Console.WriteLine($"Loading AWS Credentials");
+            bool success = false;
+            if (!checkIfCrtOrKeyExist())
+            {
+                Console.WriteLine("Starting Onboarding");
 
-            _name = $"{_name}{SerialNr}";
+                success = CreateCertAndKeys();
 
-            Console.WriteLine("Starting Onboarding");
-
-            CreateCertAndKeys();
-
-            CreateThing();
+                success = CreateThing();
 
 
-           if (DeleteCredentials())
-               Console.WriteLine("Cerdentials Deleted not safely");
+                if (DeleteCredentials())
+                {
+                    Console.WriteLine("Cerdentials Deleted not safely");
+                }
+                else
+                {
+                    Console.WriteLine("Credentials not Deleted somehow...");
+                }
+
+
+                Console.WriteLine("Onboarding finished successfully: "+success);
+                return;
+            }
             else
-                Console.WriteLine("Credentials not Deleted somehow...");
-
-            Console.WriteLine("Onboarding Finished");
+            {
+                Console.WriteLine("There already Exists a key or crt file! Onboarding not started.");
+                return;
+            }
         }
 
 
-   /* Creates Certificates and Keys in IoT Core and downloads them.
-    *     This particular Crt and key combination can be downloaded only once from the IoT Core.
-   */
-
-
-        private static void CreateCertAndKeys()
+       /** Creates Certificates and Keys in IoT Core, downloads them and writes them to files.
+        * This particular Crt and key combination can be downloaded only once from the IoT Core.
+       */
+        private static bool CreateCertAndKeys()
         {
-            CreateKeysAndCertificateRequest request = new CreateKeysAndCertificateRequest {SetAsActive = true};
 
-            CreateKeysAndCertificateResponse response = IoT.CreateKeysAndCertificate(request);
-
+            CreateKeysAndCertificateResponse response = getKeyAndCertResponse();
             _CRTid = response.CertificateArn;
 
-            WriteKeyCertToFile(response.KeyPair.PrivateKey, response.CertificatePem);
+            return WriteKeyCertToFile(response.KeyPair.PrivateKey, response.CertificatePem);
+                        
+        }
+
+
+        /**Askes AWS IoT for creation and sending of Certificate and Key.
+         */
+        private static CreateKeysAndCertificateResponse getKeyAndCertResponse()
+        {
+            CreateKeysAndCertificateRequest request = new CreateKeysAndCertificateRequest { SetAsActive = true };
+            return IoT.CreateKeysAndCertificate(request);
         }
 
 
         /** Creates a thing in IoT Core register.
          *  Serial Number And CRT id will be added as Thing Attributes.
          */
-        private static void CreateThing()
+        private static bool CreateThing()
         {
+      
+            var response = IoT.CreateThing(
+                makeThingRequest(
+                    makeAttributePayloadForThingCreation()));
+
+            Console.WriteLine($"thing creation response: {response.ThingArn}");
+
+            return(response.HttpStatusCode == HttpStatusCode.OK);
+        }
+
+        /**Creates an AttributePayoad with the necessary Attributes for Thing creation in AWS IoT.
+         * 
+         */ 
+        private static AttributePayload makeAttributePayloadForThingCreation()
+        {
+
             var attributePayload = new AttributePayload();
             attributePayload.Attributes.Add("SerialNr", SerialNr);
             attributePayload.Attributes.Add("CRTId", _CRTid);
 
-            var thingRequest = new CreateThingRequest();
-            thingRequest.ThingName = _name;
+            return attributePayload;
+        }
+
+        /**Creates an AttributePayoad with the necessary Attributes for Thing creation in AWS IoT.
+        * 
+        */
+        private static CreateThingRequest makeThingRequest(AttributePayload attributePayload)
+        {
+            CreateThingRequest thingRequest = new CreateThingRequest();
+            thingRequest.ThingName = DeviceName;
             thingRequest.AttributePayload = attributePayload;
 
-            var response = IoT.CreateThing(thingRequest);
-
-            Console.WriteLine($"thing creation response: {response.ThingArn}");
-            Console.Write("createThing>");
-            Console.WriteLine(response.HttpStatusCode == HttpStatusCode.OK);
+            return thingRequest;
         }
 
 
-        private static void WriteKeyCertToFile(String privateKeyString, String certString)
+        /** Writes Key and Certificate to the Location defined in the app settings.
+         * Returns False if:
+         *      1. One Of the strings is empty
+         *      2. Writing failed.
+         */
+        private static bool WriteKeyCertToFile(String privateKeyString, String certString)
         {
-            System.IO.File.WriteAllText(DevicePrivateKeyFileLocation, privateKeyString);
-            System.IO.File.WriteAllText(DeviceCertFileLocation, certString);
+            if (checkCrtOrKey(privateKeyString) && checkCrtOrKey(certString))
+            {
+                return WriteToFile(DevicePrivateKeyFileLocation, privateKeyString)&&WriteToFile(DeviceCertFileLocation, certString);
+            }
+
+            return false;
         }
 
+        /** Checks Certificate and Key.
+         * TODO: use openssl to check the validity?
+         */ 
+        private static bool checkCrtOrKey(string crt)
+        {
+            return crt.Length != 0;
+        }
+
+        /** Writes String to File.
+         * Returns true if file exists after writing, otherwise false.
+         */
+        private static bool WriteToFile(string location,string _string)
+        {
+            System.IO.File.WriteAllText(location, _string);
+            return File.Exists(location);
+        }
+
+        /** Checks if a file for Certificate or Key already exitst in their location.
+         * 
+         */ 
+        private static bool checkIfCrtOrKeyExist()
+        {
+            return File.Exists(DevicePrivateKeyFileLocation) || File.Exists(DeviceCertFileLocation);
+        }
 
       /**Deletes the Credential File>
       * TODO: secure Deletion
