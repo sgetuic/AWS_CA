@@ -11,7 +11,7 @@ namespace UIC.AWS.Onboarding.Device
 {
     internal class Onboard
     {
-        private static readonly IAmazonIoT IoT = new AmazonIoTClient();
+        private static readonly        IAmazonIoT IoT               = new AmazonIoTClient();
 
         private static readonly string DeviceCertAndKeyLocation     = AWSConfigs.GetConfig("DeviceCertAndKeySaveLocation");
 
@@ -23,9 +23,7 @@ namespace UIC.AWS.Onboarding.Device
 
         private static readonly string SerialNr                     = AWSConfigs.GetConfig("DeviceSerialNumber");
 
-        /**Device name. Will be concatenated with _serialNr
-         * 
-         */
+        /**Device name. Will be concatenated with SerialNr */
         private static string _name = AWSConfigs.GetConfig("DeviceName"); 
 
         private static string _CRTid;
@@ -44,10 +42,10 @@ namespace UIC.AWS.Onboarding.Device
             CreateThing();
 
 
-//            if (DeleteCredentials())
-//                Console.WriteLine("Cerdentials Deleted not safely");
-//            else
-//                Console.WriteLine("Credentials not Deleted somehow...");
+           if (DeleteCredentials())
+               Console.WriteLine("Cerdentials Deleted not safely");
+            else
+                Console.WriteLine("Credentials not Deleted somehow...");
 
             Console.WriteLine("Onboarding Finished");
         }
@@ -55,7 +53,6 @@ namespace UIC.AWS.Onboarding.Device
 
    /* Creates Certificates and Keys in IoT Core and downloads them.
     *     This particular Crt and key combination can be downloaded only once from the IoT Core.
-   * 
    */
 
 
@@ -72,7 +69,7 @@ namespace UIC.AWS.Onboarding.Device
 
 
         /** Creates a thing in IoT Core register.
-         *  
+         *  Serial Number And CRT id will be added as Thing Attributes.
          */
         private static void CreateThing()
         {
@@ -100,9 +97,7 @@ namespace UIC.AWS.Onboarding.Device
 
 
       /**Deletes the Credential File>
-      *
       * TODO: secure Deletion
-      * 
       */
         private static bool DeleteCredentials()
         {

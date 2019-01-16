@@ -40,7 +40,7 @@ namespace Function
         private static readonly string FailedString_PolicyAttaching                 = "Failed to Attach the Policy";
         private static readonly string FailedString_CertificateAttaching            = "Failed to Attach the Certificate";
         private static readonly string FailedString_UpdateDB                        = "Failed to update Database";
-        private static readonly string FailedString_AlreadyRegistered               = "SerialNr was already redistered";
+        private static readonly string FailedString_AlreadyRegistered               = "SerialNr was already registered";
         private static readonly string SuccessString                                = "OK";
 
 
@@ -129,7 +129,7 @@ namespace Function
                     &&
                     await moveThingToGroup(OnboardingFailedGroupName));
             }
-            return (await putItem(TableName, _serialNr, false, _timeStampUTC, _registrationTimeStampUTC, false, reason, Condition_SerialNrNotExists)
+            return (await putItem(TableName, _serialNr+"FAKE", false, _timeStampUTC, _registrationTimeStampUTC, false, reason, Condition_SerialNrNotExists)
                     &&
                     await moveThingToGroup(OnboardingFailedGroupName));
         }
@@ -269,14 +269,15 @@ namespace Function
                     { SerialNrKey, new AttributeValue {
                         S = serialNr
                     }},
-                    { RegistredBoolKey, new AttributeValue {
-                        BOOL = registered
-                    }},
+                  
                     { TimeStampUTCKey, new AttributeValue {
                         N = timeStampUTC.ToString()
                     }},
                     { RegistrationTimeStampCKey, new AttributeValue {
                         N = registrationTimeStampUTC.ToString()
+                    }},
+                      { RegistredBoolKey, new AttributeValue {
+                        BOOL = registered
                     }},
                     { RegistrationSuccessfullKey, new AttributeValue
                     {

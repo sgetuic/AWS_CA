@@ -14,7 +14,7 @@
     "function-memory-size" : 512,
     "function-timeout"     : 15,
     "function-handler"     : "Lambda_registration_finishing::Function.Function::FunctionHandler",
-    "function-name"        : "complete_thing_registration",
+    "function-name"        : "LambdaRegistrationFunction",
     "function-description" : "",
     "tracing-mode"         : "PassThrough",
     "environment-variables" : ""
