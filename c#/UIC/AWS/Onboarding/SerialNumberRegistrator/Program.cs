@@ -5,12 +5,11 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 
 
+
 namespace SerialNrRegistrator
 {
 
-    /** https://eu-central-1.console.aws.amazon.com/dynamodb/home?region=eu-central-1#tables:selected=deviceSerialNumbers;tab=items
-     * 
-     */
+    
     internal class Program
     {
 
