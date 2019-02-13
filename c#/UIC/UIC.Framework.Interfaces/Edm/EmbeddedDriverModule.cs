@@ -5,6 +5,7 @@ using UIC.Framework.Interfaces.Project;
 
 namespace UIC.Framework.Interfaces.Edm
 {
+    [Obsolete("The knew Interface that should be used is called IEmbeddedDriverModule", false)]
     public interface EmbeddedDriverModule
     {
         EdmIdentifier Identifier { get; }

@@ -5,7 +5,7 @@ using UIC.SGET.ConnectorImplementation.Monitoring.Evaluation;
 
 namespace UIC.SGET.ConnectorImplementation.Monitoring
 {
-    internal class DataPointEvaluatorProvider
+    internal class DataPointEvaluatorProvider : IDataPointEvaluatorProvider
     {
         public IDataPointEvaluator ProvideFor(DatapointValue val, DataPointEvaluatorParam param)
         {

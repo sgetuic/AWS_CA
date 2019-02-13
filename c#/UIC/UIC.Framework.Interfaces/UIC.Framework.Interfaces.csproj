@@ -79,6 +79,8 @@
   <ItemGroup>
     <Compile Include="Communication\Projects\ProjectAgent.cs" />
     <Compile Include="Configuration\UicConfiguartion.cs" />
+    <Compile Include="Eapi\IEapiInitializer.cs" />
+    <Compile Include="Edm\InterfaceEmbeddedDriverModule.cs" />
     <Compile Include="UniversalIotConnector.cs" />
     <Compile Include="Edm\Value\AttributeValue.cs" />
     <Compile Include="Communication\Application\CommunicationAgent.cs" />

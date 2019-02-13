@@ -9,7 +9,7 @@ using UIC.Util.Logging;
 
 namespace UIC.SGET.ConnectorImplementation.Monitoring {
     internal class DatapointMonitor : IDisposable {
-       private readonly DataPointEvaluatorProvider _evaluatorProvider;
+       private readonly IDataPointEvaluatorProvider _evaluatorProvider;
         private readonly UniversalIotConnector _connector;
         private readonly ILogger _logger;
         private bool _isDisposed;
@@ -17,18 +17,13 @@ namespace UIC.SGET.ConnectorImplementation.Monitoring {
         private readonly ProjectDatapointTask _dataPointTask;
         private readonly EmbeddedDriverModule _edm;
 
-        public DatapointMonitor(ProjectDatapointTask dataPointTask, DataPointEvaluatorProvider evaluatorProvider, UniversalIotConnector connector, ILogger logger, EmbeddedDriverModule edm)
+        public DatapointMonitor(ProjectDatapointTask dataPointTask, IDataPointEvaluatorProvider evaluatorProvider, UniversalIotConnector connector, ILogger logger, EmbeddedDriverModule edm)
         {
-            if (dataPointTask == null) throw new ArgumentNullException("dataPointTask");
-            if (logger == null) throw new ArgumentNullException("logger");
-            if (connector == null) throw new ArgumentNullException("connector");
-            if (edm == null) throw new ArgumentNullException("edm");
-
-            _dataPointTask = dataPointTask;
-            _evaluatorProvider = evaluatorProvider;
-            _connector = connector;
-            _logger = logger;
-            _edm = edm;
+            _dataPointTask = dataPointTask ?? throw new ArgumentNullException("dataPointTask");
+            _evaluatorProvider = evaluatorProvider ?? new DataPointEvaluatorProvider();
+            _connector = connector ?? throw new ArgumentNullException("connector");
+            _logger = logger ?? throw new ArgumentNullException("logger");
+            _edm = edm ?? throw new ArgumentNullException("edm");
             (new Thread(Target)).Start();
         }
 
