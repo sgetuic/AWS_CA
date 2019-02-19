@@ -14,8 +14,9 @@
     "function-memory-size" : 512,
     "function-timeout"     : 15,
     "function-handler"     : "Lambda_registration_finishing::Function.Function::FunctionHandler",
-    "function-name"        : "LambdaRegistrationFunction",
+    "function-name"        : "uic_onboarding_check_and_finish",
     "function-description" : "",
     "tracing-mode"         : "PassThrough",
-    "environment-variables" : ""
+    "environment-variables" : "",
+    "function-role"         : "arn:aws:iam::721814442376:role/uic_onboarding_lambda_role"
 }
